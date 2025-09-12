@@ -1,0 +1,28 @@
+# `exports` is a required field available in every module.
+# Its purpose is to specify files to be placed somewhere other than the default location.
+# `exports` should be a list of objects with `source` and `target` keys.
+# The `source` field contains the name of the file.
+# The `target` field contains the destination path.
+# The default location is $HOME/.config/$MODULE_NAME.
+# If you do not wish to export any files, leave `exports` empty or set it to null.
+exports:
+  - source: "foo"
+    target: "bar"
+
+# `include` is an optional field available in every module.
+# It should be a list of objects with `module` and `path` keys.
+# The `module` field contains the name of the module to include.
+# The `path` field contains the relative path to the directory containing that module.
+include:
+  - module: "whiskey"
+    path: "tango"
+
+# `templates` is an optional field available in every module.
+# Templates have an open structure and can be nested arbitrarily.
+# To create templates, simply add them to the `templates` mapping.
+# For example, { eta: { tau: "phi" } } can be accessed in code with:
+# !(eta.tau)! (rendered to `phi`)
+# You can replace !( and )! with whatever delimiters you define in your `global.yaml`.
+templates:
+  eta:
+    tau: "phi"

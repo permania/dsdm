@@ -1,0 +1,20 @@
+[package]
+name = "dsdm"
+description = "DiStilled Dotfile Management."
+version = "0.1.0"
+license = "MPL-2.0"
+edition = "2024"
+
+[dependencies]
+clap = { version = "4.5.47", features = ["derive"] }
+dirs-next = "2.0.0"
+env_logger = "0.11.8"
+inquire = "0.7.5"
+log = "0.4.28"
+once_cell = "1.21.3"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_yaml = "0.9.34"
+shellexpand = "3.1.1"
+thiserror = "2.0.16"
+upon = { version = "0.10.0", features = ["syntax"] }
+whoami = "1.6.1"

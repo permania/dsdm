@@ -1,0 +1,19 @@
+# Global templates available in every module.
+# Good for things you reuse like colors and fonts.
+templates:
+  colors:
+    base00: "FFFFFF"
+    # ... #
+  fonts:
+    foreground: "Maple Mono"
+    secondary: "VictorMono Nerd Font"
+    # Add more values at your discretion.
+# Apply with the global prefix:
+# !(global.fonts.foreground)!
+
+  # Sets the delimiters for templates.
+  # The default is "!(" and ")!", resulting in strings like, "!( global.fonts.foreground )!".
+  # Try values like "{{" and "}}" or "<%" and "%>", or whatever pleases you.
+delimiters:
+  open: "!("
+  close: ")!"
