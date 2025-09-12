@@ -9,7 +9,7 @@ templates:
     secondary: "VictorMono Nerd Font"
     # Add more values at your discretion.
 # Apply with the global prefix:
-# !(global.fonts.foreground)!
+# !( global.fonts.foreground )!
 
   # Sets the delimiters for templates.
   # The default is "!(" and ")!", resulting in strings like, "!( global.fonts.foreground )!".
