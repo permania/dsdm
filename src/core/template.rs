@@ -55,7 +55,7 @@ where
     T: Serialize,
 {
     let contents: String = fs::read_to_string(file)?;
-    Ok(render_template(&contents, ctx)?)
+    render_template(&contents, ctx)
 }
 
 /// Create a `TemplateContext` from a `templates` field deserialized from `mod.yaml`

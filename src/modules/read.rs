@@ -61,22 +61,17 @@ pub fn apply(args: ModuleArgs) -> Result<(), DSDMError> {
 
     let cfg: Module = read(args.clone())?;
 
-    let tpl = build_context(
-        cfg.templates.as_ref().map(|t| t.clone()),
-        global::global_templates(),
-    )?;
+    let tpl = build_context(cfg.templates.clone(), global::global_templates())?;
     println!("{:#?}", tpl);
 
     for entry in fs::read_dir(module_dir)? {
-        let file_content: String;
-
         let entry = entry?;
         let path = entry.path();
         if path.file_name().and_then(|n| n.to_str()) == Some(MODULE_FILE_PATH) {
             continue;
         }
 
-        file_content = render_template_file(path, &tpl)?;
+        let file_content = render_template_file(path, &tpl)?;
 
         info!("generating export path");
         let out_path = expand_tilde(get_export_path(

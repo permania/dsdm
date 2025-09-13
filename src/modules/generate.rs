@@ -10,16 +10,16 @@ use std::{
     path::{Path, PathBuf},
 };
 
-pub const DSDM_CONFIG_PATH: &'static str = ".dsdm.d";
-pub const MODULE_FILE_PATH: &'static str = "mod.yaml";
-pub const GLOBAL_FILE_PATH: &'static str = "global.yaml";
-pub const DEFAULT_EXPORT_PATH: &'static str = ".config";
-const MODULE_TEMPLATE: &'static str = include_str!(concat!(
+pub const DSDM_CONFIG_PATH: &str = ".dsdm.d";
+pub const MODULE_FILE_PATH: &str = "mod.yaml";
+pub const GLOBAL_FILE_PATH: &str = "global.yaml";
+pub const DEFAULT_EXPORT_PATH: &str = ".config";
+const MODULE_TEMPLATE: &str = include_str!(concat!(
     env!("CARGO_MANIFEST_DIR"),
     "/src/yaml/",
     "mod.yaml"
 ));
-const GLOBAL_YAML: &'static str = include_str!(concat!(
+const GLOBAL_YAML: &str = include_str!(concat!(
     env!("CARGO_MANIFEST_DIR"),
     "/src/yaml/",
     "global.yaml"
