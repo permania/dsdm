@@ -21,7 +21,7 @@ include:
 # Templates have an open structure and can be nested arbitrarily.
 # To create templates, simply add them to the `templates` mapping.
 # For example, { eta: { tau: "phi" } } can be accessed in code with:
-# !(eta.tau)! (rendered to `phi`)
+# !( eta.tau )! (rendered to `phi`)
 # You can replace !( and )! with whatever delimiters you define in your `global.yaml`.
 templates:
   eta:

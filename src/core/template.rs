@@ -13,14 +13,6 @@ pub enum TemplateContext {
     Nested(HashMap<String, TemplateContext>),
 }
 
-impl TemplateContext {
-    pub fn prepend(self, field: String) -> Self {
-        let mut map = HashMap::new();
-        map.insert(field, self);
-        TemplateContext::Nested(map)
-    }
-}
-
 impl Serialize for TemplateContext {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -77,10 +69,16 @@ pub fn build_context(
 
             if let Value::Mapping(global_map) = global? {
                 info!("registering global templates");
-                for (k, v) in global_map {
-                    let key = k.as_str().ok_or(DSDMError::InvalidKey)?;
-                    let value = build_context(Some(v.clone()), Ok(Value::Null))?;
-                    context_map.insert("global".to_string(), value.prepend(key.to_string()));
+                let global_entry = context_map
+                    .entry("global".to_string())
+                    .or_insert_with(|| TemplateContext::Nested(HashMap::new()));
+
+                if let TemplateContext::Nested(global_nested) = global_entry {
+                    for (k, v) in global_map {
+                        let key = k.as_str().ok_or(DSDMError::InvalidKey)?;
+                        let value = build_context(Some(v.clone()), Ok(Value::Null))?;
+                        global_nested.insert(key.to_string(), value);
+                    }
                 }
             }
 
@@ -95,6 +93,21 @@ pub fn build_context(
                 context_map.insert(key.to_string(), value);
             }
 
+            Ok(TemplateContext::Nested(context_map))
+        }
+        None => {
+            info!("no local templates found");
+
+            let mut context_map = HashMap::new();
+
+            if let Value::Mapping(global_map) = global? {
+                info!("registering global templates");
+                for (k, v) in global_map {
+                    let key = k.as_str().ok_or(DSDMError::InvalidKey)?;
+                    let value = build_context(Some(v.clone()), Ok(Value::Null))?;
+                    context_map.insert("global".to_string(), value.prepend(key.to_string()));
+                }
+            }
             Ok(TemplateContext::Nested(context_map))
         }
         Some(Value::String(s)) => Ok(TemplateContext::Value(s.clone())),

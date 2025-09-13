@@ -59,19 +59,13 @@ pub fn apply(args: ModuleArgs) -> Result<(), DSDMError> {
     info!("applying module {}", &args.title);
     let module_dir = craft_path_module(&args)?;
 
-    info!("reading module");
     let cfg: Module = read(args.clone())?;
-    let tpl: Option<TemplateContext>;
 
-    if let Some(ref temp) = cfg.templates {
-        info!("creating template context");
-        tpl = Some(build_context(
-            Some(temp.clone()),
-            global::global_templates(),
-        )?);
-    } else {
-        tpl = None;
-    }
+    let tpl = build_context(
+        cfg.templates.as_ref().map(|t| t.clone()),
+        global::global_templates(),
+    )?;
+    println!("{:#?}", tpl);
 
     for entry in fs::read_dir(module_dir)? {
         let file_content: String;
@@ -82,12 +76,7 @@ pub fn apply(args: ModuleArgs) -> Result<(), DSDMError> {
             continue;
         }
 
-        if let Some(ref tpl) = tpl {
-            info!("rendering template");
-            file_content = render_template_file(path, tpl)?;
-        } else {
-            file_content = fs::read_to_string(path)?;
-        }
+        file_content = render_template_file(path, &tpl)?;
 
         info!("generating export path");
         let out_path = expand_tilde(get_export_path(
