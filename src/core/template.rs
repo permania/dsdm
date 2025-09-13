@@ -102,10 +102,16 @@ pub fn build_context(
 
             if let Value::Mapping(global_map) = global? {
                 info!("registering global templates");
-                for (k, v) in global_map {
-                    let key = k.as_str().ok_or(DSDMError::InvalidKey)?;
-                    let value = build_context(Some(v.clone()), Ok(Value::Null))?;
-                    context_map.insert("global".to_string(), value.prepend(key.to_string()));
+                let global_entry = context_map
+                    .entry("global".to_string())
+                    .or_insert_with(|| TemplateContext::Nested(HashMap::new()));
+
+                if let TemplateContext::Nested(global_nested) = global_entry {
+                    for (k, v) in global_map {
+                        let key = k.as_str().ok_or(DSDMError::InvalidKey)?;
+                        let value = build_context(Some(v.clone()), Ok(Value::Null))?;
+                        global_nested.insert(key.to_string(), value);
+                    }
                 }
             }
             Ok(TemplateContext::Nested(context_map))

@@ -8,7 +8,7 @@ use crate::{
     cli::{arg_parser::ModuleArgs, error::DSDMError},
     core::{
         global,
-        template::{build_context, render_template_file, TemplateContext},
+        template::{build_context, render_template_file},
     },
     modules::generate::{craft_path_module, module_exists, DEFAULT_EXPORT_PATH, MODULE_FILE_PATH},
 };
