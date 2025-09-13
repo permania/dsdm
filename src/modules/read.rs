@@ -36,8 +36,6 @@ pub fn debug(args: ModuleArgs) -> Result<(), DSDMError> {
     info!("debugging module {}", &args.title);
     let cfg: Module = read(args)?;
 
-    println!("{:#?}", cfg);
-
     Ok(())
 }
 
@@ -62,7 +60,6 @@ pub fn apply(args: ModuleArgs) -> Result<(), DSDMError> {
     let cfg: Module = read(args.clone())?;
 
     let tpl = build_context(cfg.templates.clone(), global::global_templates())?;
-    println!("{:#?}", tpl);
 
     for entry in fs::read_dir(module_dir)? {
         let entry = entry?;
