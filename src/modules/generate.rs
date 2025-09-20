@@ -64,17 +64,17 @@ pub fn delete_module(args: ModuleArgs) -> Result<(), DSDMError> {
         )));
     }
 
-    let mut module_dir = craft_path_module(&args)?;
+    let module_dir = craft_path_module(&args)?;
 
     if !module_exists::<&String>(&args.title, args.subdir)? {
         return Err(DSDMError::NotExists);
     }
 
-    module_dir.push(&args.title);
-
     let ans = Confirm::new(&format!("Delete module {}?", args.title))
         .with_default(false)
         .prompt();
+
+    info!("deleting {:?}", module_dir);
 
     match ans {
         Ok(true) => fs::remove_dir_all(module_dir)?,
