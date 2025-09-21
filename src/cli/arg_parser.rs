@@ -1,6 +1,6 @@
 use clap::{
-    builder::{styling::AnsiColor, Styles},
     Args, Parser, Subcommand,
+    builder::{Styles, styling::AnsiColor},
 };
 
 #[derive(Debug, Parser)]

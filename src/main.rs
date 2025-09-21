@@ -13,7 +13,7 @@ use cli::{
     error::DSDMError,
 };
 use env_logger::Builder;
-use log::{info, LevelFilter};
+use log::{LevelFilter, info};
 
 fn run() -> Result<(), DSDMError> {
     let args = DSDMArgs::parse();

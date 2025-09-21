@@ -1,5 +1,5 @@
 use log::{info, warn};
-use serde::{ser::SerializeMap, Serialize, Serializer};
+use serde::{Serialize, Serializer, ser::SerializeMap};
 use serde_yaml::Value;
 use std::{collections::HashMap, fs, path::Path};
 use upon::{Engine, Syntax};

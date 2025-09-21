@@ -5,7 +5,7 @@ use serde_yaml::Value;
 
 use crate::{
     cli::error::DSDMError,
-    modules::generate::{craft_path, GLOBAL_FILE_PATH},
+    modules::generate::{GLOBAL_FILE_PATH, craft_path},
 };
 
 #[derive(Debug, Deserialize)]

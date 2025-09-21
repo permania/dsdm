@@ -121,7 +121,7 @@ pub fn craft_path_module(args: &ModuleArgs) -> Result<PathBuf, DSDMError> {
 }
 
 /// Creates a directory safely
-fn ensure_dir(path: &Path, msg: &str) -> Result<(), DSDMError> {
+pub fn ensure_dir(path: &Path, msg: &str) -> Result<(), DSDMError> {
     info!("{}", msg);
     fs::create_dir_all(path)
         .map_err(|e| DSDMError::DirError(format!("Failed to create {}: {}", path.display(), e)))?;

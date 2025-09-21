@@ -1,4 +1,4 @@
-use std::io;
+use std::{io, path::StripPrefixError};
 
 use log::error;
 use thiserror::Error;
@@ -19,6 +19,15 @@ pub enum DSDMError {
 
     #[error("Directory Error: {0}")]
     DirError(String),
+
+    #[error("Walkdir Error: {0}")]
+    WalkDir(#[from] walkdir::Error),
+
+    #[error("Error copying files: {0}")]
+    FSExtra(#[from] fs_extra::error::Error),
+
+    #[error("Strip Prefix Error: {0}")]
+    StripPrefix(#[from] StripPrefixError),
 
     #[error("Module already exists.")]
     ModuleExists,
