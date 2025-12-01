@@ -1,4 +1,4 @@
-#+title: DSDM 0.2.0
+#+title: DSDM 0.3.0
 
 * Headache-Free Dotfile Management!
 ~dsdm~ is designed as an alternative to more comprehensive dotfile tools like ~chezmoi~ or ~yadm~, as well as dead simple tools like ~stow~.
