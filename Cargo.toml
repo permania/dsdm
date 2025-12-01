@@ -13,6 +13,7 @@ fs_extra = "1.3.0"
 inquire = "0.7.5"
 log = "0.4.28"
 once_cell = "1.21.3"
+ptree = "0.5.2"
 serde = { version = "1.0.219", features = ["derive"] }
 serde_yaml = "0.9.34"
 shellexpand = "3.1.1"

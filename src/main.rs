@@ -8,7 +8,7 @@ use cli::{
         DSDMArgs,
         DSDMCommands::{Debug, Module},
         DebugSubCommand,
-        ModuleSubCommand::{Apply, Create, Destroy},
+        ModuleSubCommand::{Apply, Create, Deps, Destroy},
     },
     error::DSDMError,
 };
@@ -32,6 +32,7 @@ fn run() -> Result<(), DSDMError> {
             Create(args) => modules::generate::module(args)?,
             Destroy(args) => modules::generate::delete_module(args)?,
             Apply(args) => modules::read::apply(args)?,
+            Deps(args) => modules::read::print_dep_tree(args)?,
         },
         Debug(wrapper) => match wrapper.cmd {
             DebugSubCommand::Module(args) => modules::read::debug(args)?,

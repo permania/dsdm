@@ -1,6 +1,11 @@
-use std::{fs, path::{Path, PathBuf}};
+use std::{
+    borrow::Cow,
+    fs, io,
+    path::{Path, PathBuf},
+};
 
 use log::info;
+use ptree::{Style, TreeItem, print_tree};
 use serde::Deserialize;
 use serde_yaml::Value;
 use walkdir::WalkDir;
@@ -11,7 +16,7 @@ use crate::{
         global,
         template::{build_context, render_template_file},
     },
-    modules::generate::{craft_path_module, module_exists, DEFAULT_EXPORT_PATH, MODULE_FILE_PATH},
+    modules::generate::{DEFAULT_EXPORT_PATH, MODULE_FILE_PATH, craft_path_module, module_exists},
 };
 
 #[derive(Debug, Deserialize)]
@@ -21,9 +26,9 @@ struct ExportEntry {
 }
 
 #[derive(Debug, Deserialize)]
-struct IncludeEntry {
-    path: Option<String>,
-    module: String,
+pub struct IncludeEntry {
+    pub path: Option<String>,
+    pub module: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -31,6 +36,24 @@ pub struct Module {
     exports: Option<Vec<ExportEntry>>,
     include: Option<Vec<IncludeEntry>>,
     templates: Option<Value>,
+}
+
+#[derive(Clone, Debug)]
+struct DepGraph {
+    name: String,
+    children: Vec<DepGraph>,
+}
+
+impl TreeItem for DepGraph {
+    type Child = Self;
+
+    fn write_self<W: io::Write>(&self, f: &mut W, style: &Style) -> io::Result<()> {
+        write!(f, "{}", style.paint(&self.name))
+    }
+
+    fn children(&'_ self) -> Cow<'_, [Self::Child]> {
+        Cow::from(self.children.clone())
+    }
 }
 
 pub fn debug(args: ModuleArgs) -> Result<(), DSDMError> {
@@ -54,6 +77,30 @@ pub fn read(args: ModuleArgs) -> Result<Module, DSDMError> {
     }
 }
 
+fn mod_to_dep(args: ModuleArgs) -> Result<DepGraph, DSDMError> {
+    let title = args.title.clone();
+    let module = read(args)?;
+
+    Ok(DepGraph {
+        name: title,
+        children: if let Some(includes) = module.include {
+            includes
+                .into_iter()
+                .map(|inc| mod_to_dep(ModuleArgs::from(inc)))
+                .collect::<Result<Vec<_>, DSDMError>>()?
+        } else {
+            vec![]
+        },
+    })
+}
+
+pub fn print_dep_tree(args: ModuleArgs) -> Result<(), DSDMError> {
+    let tree = mod_to_dep(args)?;
+    print_tree(&tree)?;
+
+    Ok(())
+}
+
 pub fn apply(args: ModuleArgs) -> Result<(), DSDMError> {
     info!("applying module {}", &args.title);
 
@@ -61,13 +108,8 @@ pub fn apply(args: ModuleArgs) -> Result<(), DSDMError> {
     let cfg: Module = read(args.clone())?;
     let tpl = build_context(cfg.templates.clone(), global::global_templates())?;
 
-    for entry in WalkDir::new(&module_dir)
-        .into_iter()
-        .filter_map(Result::ok)
-    {
-        let relative_path = entry.path()
-            .strip_prefix(&module_dir)?
-            .to_path_buf();
+    for entry in WalkDir::new(&module_dir).into_iter().filter_map(Result::ok) {
+        let relative_path = entry.path().strip_prefix(&module_dir)?.to_path_buf();
 
         let out_path = get_export_path(&args, &cfg.exports, &relative_path)?;
 
@@ -84,7 +126,7 @@ pub fn apply(args: ModuleArgs) -> Result<(), DSDMError> {
                 fs::create_dir_all(parent)?;
             }
 
-	    info!("writing to {:?}", out_path);
+            info!("writing to {:?}", out_path);
             fs::write(&out_path, content)?;
         }
     }
@@ -115,29 +157,22 @@ fn get_export_path(
         .join(relative_path);
 
     if let Some(exp) = exports.as_ref() {
-	for item in exp {
-	    let source_path = Path::new(&item.source);
-	    if relative_path == source_path || relative_path.starts_with(source_path) {
-		let suffix = relative_path.strip_prefix(source_path)
-		    .unwrap_or_else(|_| Path::new(""));
-		out_path = expand_tilde(PathBuf::from(&item.target));
+        for item in exp {
+            let source_path = Path::new(&item.source);
+            if relative_path == source_path || relative_path.starts_with(source_path) {
+                let suffix = relative_path
+                    .strip_prefix(source_path)
+                    .unwrap_or_else(|_| Path::new(""));
+                out_path = expand_tilde(PathBuf::from(&item.target));
 
-		if !suffix.as_os_str().is_empty() {
-		    out_path = out_path.join(suffix);
-		}
+                if !suffix.as_os_str().is_empty() {
+                    out_path = out_path.join(suffix);
+                }
 
-		break;
-	    }
-	}
-
-        // for item in exp {
-        //     if relative_path.file_name().map(|f| *f == *item.source).unwrap_or(false) {
-        //         out_path = expand_tilde(PathBuf::from(&item.target));
-        //         break;
-        //     }
-        // }
+                break;
+            }
+        }
     }
-
 
     Ok(out_path)
 }

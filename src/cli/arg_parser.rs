@@ -3,6 +3,8 @@ use clap::{
     builder::{Styles, styling::AnsiColor},
 };
 
+use crate::modules::read::IncludeEntry;
+
 #[derive(Debug, Parser)]
 #[command(version, about, long_about = None, styles=STYLES)]
 pub struct DSDMArgs {
@@ -57,6 +59,9 @@ pub enum ModuleSubCommand {
 
     /// Apply a module
     Apply(ModuleArgs),
+
+    /// Print the dependency graph for a module
+    Deps(ModuleArgs),
 }
 
 #[derive(Debug, Args, Clone)]
@@ -74,6 +79,15 @@ pub struct ModuleArgs {
 pub struct ModuleWrapper {
     /// The title of the module
     pub title: String,
+}
+
+impl From<IncludeEntry> for ModuleArgs {
+    fn from(entry: IncludeEntry) -> Self {
+        ModuleArgs {
+            title: entry.module,
+            subdir: entry.path,
+        }
+    }
 }
 
 const STYLES: Styles = Styles::styled()
