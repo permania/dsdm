@@ -79,6 +79,9 @@ pub fn read(args: ModuleArgs) -> Result<Module, DSDMError> {
 
 fn mod_to_dep(args: ModuleArgs) -> Result<DepGraph, DSDMError> {
     let title = args.title.clone();
+
+    info!("generating dependency graph for {}", title);
+
     let module = read(args)?;
 
     Ok(DepGraph {
@@ -87,7 +90,7 @@ fn mod_to_dep(args: ModuleArgs) -> Result<DepGraph, DSDMError> {
             includes
                 .into_iter()
                 .map(|inc| mod_to_dep(ModuleArgs::from(inc)))
-                .collect::<Result<Vec<_>, DSDMError>>()?
+                .collect::<Result<Vec<DepGraph>, DSDMError>>()?
         } else {
             vec![]
         },
